@@ -1,0 +1,87 @@
+-- dbcreate.sql
+DROP DATABASE IF EXISTS team05;
+CREATE DATABASE team05 CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE team05;
+
+-- 1. continents
+CREATE TABLE continents (
+  continent_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
+);
+
+-- 2. countries
+CREATE TABLE countries (
+  country_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  continent_id INT,
+  population BIGINT,
+  gdp DOUBLE,
+  FOREIGN KEY (continent_id) REFERENCES continents(continent_id)
+);
+
+-- 3. sports
+CREATE TABLE sports (
+  sport_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  category VARCHAR(100)
+);
+
+-- 4. events
+CREATE TABLE events (
+  event_id INT AUTO_INCREMENT PRIMARY KEY,
+  sport_id INT,
+  event_name VARCHAR(100),
+  gender ENUM('M','F','Mixed'),
+  FOREIGN KEY (sport_id) REFERENCES sports(sport_id)
+);
+
+-- 5. olympics
+CREATE TABLE olympics (
+  olympic_id INT AUTO_INCREMENT PRIMARY KEY,
+  year INT,
+  host_city VARCHAR(100),
+  season ENUM('Summer','Winter')
+);
+
+-- 6. athletes
+CREATE TABLE athletes (
+  athlete_id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100),
+  gender ENUM('M','F'),
+  birth_year INT,
+  country_id INT,
+  FOREIGN KEY (country_id) REFERENCES countries(country_id)
+);
+
+-- 7. results
+CREATE TABLE results (
+  result_id INT AUTO_INCREMENT PRIMARY KEY,
+  athlete_id INT,
+  event_id INT,
+  olympic_id INT,
+  medal ENUM('Gold','Silver','Bronze','None') DEFAULT 'None',
+  FOREIGN KEY (athlete_id) REFERENCES athletes(athlete_id),
+  FOREIGN KEY (event_id) REFERENCES events(event_id),
+  FOREIGN KEY (olympic_id) REFERENCES olympics(olympic_id)
+);
+
+-- 8. medal_summary
+CREATE TABLE medal_summary (
+  summary_id INT AUTO_INCREMENT PRIMARY KEY,
+  country_id INT,
+  olympic_id INT,
+  gold INT DEFAULT 0,
+  silver INT DEFAULT 0,
+  bronze INT DEFAULT 0,
+  total INT DEFAULT 0,
+  FOREIGN KEY (country_id) REFERENCES countries(country_id),
+  FOREIGN KEY (olympic_id) REFERENCES olympics(olympic_id)
+);
+
+-- 9. users (optional)
+CREATE TABLE users (
+  user_id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(50) UNIQUE,
+  password VARCHAR(255),
+  country_focus VARCHAR(100)
+);
