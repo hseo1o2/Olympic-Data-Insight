@@ -1,0 +1,239 @@
+event_id,sport_id,name
+1,1,Men's Moguls
+2,1,Men's Freeski Halfpipe
+3,1,Men's Freeski Big Air
+4,1,Men's Ski Cross
+5,1,Women's Freeski Big Air
+6,1,Women's Moguls
+7,1,Women's Ski Cross
+8,1,Women's Aerials
+9,1,Women's Freeski Halfpipe
+10,1,Women's Freeski Slopestyle
+11,1,Men's Freeski Slopestyle
+12,2,Women's 500m
+13,2,Men's 500m
+14,2,Men's 1500m
+15,2,Women's 1000m
+16,2,Women's 1500m
+17,3,Women's Snowboard Halfpipe
+18,3,Women's Snowboard Cross
+19,3,Men's Parallel Giant Slalom
+20,3,Women's Snowboard Big Air
+21,3,Men's Snowboard Cross
+22,3,Men's Snowboard Slopestyle
+23,3,Men's Snowboard Halfpipe
+24,3,Women's Snowboard Slopestyle
+25,3,Women's Parallel Giant Slalom
+26,3,Men's Snowboard Big Air
+27,4,Men's LH Individual
+28,4,Women's NH Individual
+29,4,Men's NH Individual
+30,5,Men Single Skating
+31,6,Men's Singles
+32,6,Women's Singles
+33,7,Men's 12.5km Pursuit
+34,7,Women's 12.5km Mass Start
+35,7,Women's 10km Pursuit
+36,7,Men's 10km Sprint
+37,7,Women's 7.5km Sprint
+38,7,Men's 15km Mass Start
+39,7,Men's 20km Individual
+40,7,Women's 15km Individual
+41,8,Men's Slalom
+42,8,Men's Downhill
+43,8,Women's Super-G
+44,8,Men's Super-G
+45,8,Women's Downhill
+46,8,Men's Alpine Combined
+47,8,Men's Giant Slalom
+48,8,Women's Giant Slalom
+49,8,Women's Alpine Combined
+50,8,Women's Slalom
+51,9,Women
+52,9,Men
+53,10,Women's Sprint Free
+54,10,Women's 7.5km + 7.5km Skiathlon
+55,10,Women's 30km Mass Start Free
+56,10,Women's 10km Classic
+57,10,Men's 50km Mass Start Free
+58,10,Men's 15km Classic
+59,10,Men's Sprint Free
+60,11,Men's 1500m
+61,11,Women's 1000m
+62,11,Men's 1000m
+63,11,Women's Mass Start
+64,11,Men's 5000m
+65,11,Women's 5000m
+66,11,Women's 3000m
+67,11,Men's 10000m
+68,11,Women's 1500m
+69,11,Women's 500m
+70,12,Men Individual Gundersen Normal Hill/10km
+71,12,Men Individual Gundersen Large Hill/10km
+72,13,Women's Monobob
+73,11,Men 5000m
+74,11,Women Ladies Mass Start
+75,11,Men 500m
+76,11,Men 10000m
+77,11,Men 1500m
+78,11,Women Ladies 3000m
+79,11,Men 1000m
+80,11,Women Ladies 5000m
+81,11,Women Ladies 1500m
+82,11,Men Mass Start
+83,11,Women Ladies 1000m
+84,7,Men 20km Individual
+85,7,Women 15km Individual
+86,7,Men 10km Sprint
+87,7,Men 12.5km Pursuit
+88,7,Women 7.5km Sprint
+89,7,Women 12.5km Mass Start
+90,7,Women 10km Pursuit
+91,7,Men 15km Mass Start
+92,3,Men Snowboard Cross
+93,3,Men Big Air
+94,3,Women Ladies Slopestyle
+95,3,Women Ladies Snowboard Cross
+96,3,Women Ladies Halfpipe
+97,3,Women Ladies Parallel Giant Slalom
+98,3,Men Parallel Giant Slalom
+99,3,Men Halfpipe
+100,3,Men Slopestyle
+101,3,Women Ladies Big Air
+102,1,Women Ladies Ski Slopestyle
+103,1,Men Ski Halfpipe
+104,1,Women Ladies Moguls
+105,1,Men Moguls
+106,1,Women Ladies Ski Cross
+107,1,Women Ladies Ski Halfpipe
+108,1,Men Ski Cross
+109,1,Men Ski Slopestyle
+110,5,Women Ladies' Single Skating
+111,4,Men Large Hill Individual
+112,4,Women Ladies Normal Hill Individual
+113,4,Men Normal Hill Individual
+114,14,Women Ladies 1000m
+115,14,Women Ladies 1500m
+116,14,Women Ladies 500m
+117,14,Men 1000m
+118,14,Men 1500m
+119,8,Women Ladies Alpine Combined
+120,8,Men Alpine Combined
+121,8,Men Giant Slalom
+122,8,Men Slalom
+123,8,Men Super-G
+124,8,Women Ladies Slalom
+125,8,Women Ladies Giant Slalom
+126,8,Women Ladies Downhill
+127,8,Men Downhill
+128,8,Women Ladies Super-G
+129,6,Women Singles
+130,6,Men Singles
+131,10,Men Sprint Classic
+132,10,Men 15km Free
+133,10,Women Ladies 10km Free
+134,10,Men 15km+15km Skiathlon
+135,10,Women Ladies 7.5km+7.5km Skiathlon
+136,10,Women Ladies Sprint Classic
+137,10,Women Ladies 30km Mass Start Classic
+138,7,12.5km pursuit men
+139,7,15km mass start men
+140,7,20km men
+141,7,12.5km mass start women
+142,7,10km pursuit women
+143,7,10km men
+144,7,15km women
+145,12,Individual men
+146,12,Individual LH men
+147,8,super-G women
+148,8,super-G men
+149,8,alpine combined women
+150,8,giant slalom women
+151,8,giant slalom men
+152,8,downhill men
+153,8,downhill women
+154,8,slalom women
+155,8,alpine combined men
+156,8,slalom men
+157,2,1500m men
+158,2,1000m men
+159,2,500m men
+160,11,5000m men
+161,11,5000m women
+162,11,1000m men
+163,11,3000m women
+164,11,1500m men
+165,11,1500m women
+166,11,2x500m women
+167,11,2x500m men
+168,11,10000m men
+169,11,1000m women
+170,10,Skiathlon 15km 15km men
+171,10,Sprint 15km men
+172,10,Skiathlon 7.5+7.5km women
+173,10,50km men
+174,10,15km men
+175,10,10km women
+176,10,sprint 15km women
+177,10,30km women
+178,5,Individual women
+179,5,Individual men
+180,4,Normal Hill Individual men
+181,4,Normal Hill Individual women
+182,3,Parallel slalom women
+183,3,Half-pipe women
+184,3,Giant parallel slalom women
+185,3,Slopestyle women
+186,3,Snowboard Cross women
+187,3,Giant parallel slalom men
+188,3,Parallel slalom men
+189,3,Half-pipe men
+190,3,Slopestyle men
+191,3,Snowboard Cross men
+192,9,Individual men
+193,9,Individual women
+194,6,Singles women
+195,6,Singles men
+196,1,Ski Cross men
+197,1,Ski Halfpipe men
+198,1,Ski Slopestyle women
+199,1,Ski Halfpipe women
+200,1,Moguls men
+201,1,Moguls women
+202,1,Ski Slopestyle men
+203,1,Ski Cross women
+204,1,Aerials men
+205,8,alpin combined men
+206,12,Individual sprint men
+207,2,1000m women
+208,2,500m women
+209,4,Large Hill Individual men
+210,10,Combined 7.5 + 7.5km mass start women
+211,7,125km mass start women
+212,7,75km women
+213,7,125km pursuit men
+214,1,Men Men's 1500m
+215,1,Women Women's 1000m
+216,1,Women Women's 1500m
+217,1,Men Men's Mass Start
+218,1,Men Men's 500m
+219,1,Men Men
+220,1,Women LadiesMass Start
+221,1,Men Mens 500m
+222,1,Women Ladies500m
+223,1,Men Mens 1500m
+224,1,Men Mens 1000m
+225,1,Men Mens Mass Start
+226,1,Men Mens Parallel Giant Slalom
+227,1,Women Ladies1500m
+228,1,Women 500m women
+229,1,Women 1000m women
+230,1,Women 1500m women
+231,1,Women 2x500m women
+232,1,Women Individual women
+233,1,Men 1000m men
+234,1,Men 10000m men
+235,1,Men 2x500m men
+236,1,Men 5000m men
+237,1,Men 500m men
+238,1,Men 1500m men

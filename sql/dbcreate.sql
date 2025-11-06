@@ -1,98 +1,78 @@
--- @author: 김서연
+-- @author: 김서연 
+
 DROP DATABASE IF EXISTS team02;
 CREATE DATABASE team02 CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE team02;
 
--- 1. countries
+-- 1. countries (from countries.csv)
 CREATE TABLE countries (
-    country_code CHAR(3) PRIMARY KEY,
-    country_name VARCHAR(100) NOT NULL
+    country_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    continent_name VARCHAR(50)
 );
 
--- 2. olympics
+-- 2. olympics (from olympics.csv)
 CREATE TABLE olympics (
-    game_slug VARCHAR(50) PRIMARY KEY,
-    game_name VARCHAR(100),
-    game_location VARCHAR(100),
-    game_season ENUM('Summer', 'Winter', 'Youth'),
-    game_year INT,
-    INDEX idx_year_season (game_year, game_season)
+    olympic_id INT PRIMARY KEY,
+    year INT,
+    city VARCHAR(100),
+    slug VARCHAR(50)
 );
 
--- 3. disciplines
-CREATE TABLE disciplines (
-    discipline_title VARCHAR(100) PRIMARY KEY
+-- 3. sports (from sports.csv)
+CREATE TABLE sports (
+    sport_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    category VARCHAR(100)
 );
 
--- 4. events
+-- 4. events (from events.csv)
 CREATE TABLE events (
-    event_id INT AUTO_INCREMENT PRIMARY KEY,
-    discipline_title VARCHAR(100),
-    event_title VARCHAR(255),
-    event_gender VARCHAR(20),
-    FOREIGN KEY (discipline_title) REFERENCES disciplines(discipline_title),
-    UNIQUE KEY uk_event (discipline_title, event_title, event_gender)
+    event_id INT PRIMARY KEY,
+    sport_id INT,
+    name VARCHAR(255), 
+    FOREIGN KEY (sport_id) REFERENCES sports(sport_id)
 );
 
--- 5. participants
-CREATE TABLE participants (
-    participant_id INT AUTO_INCREMENT PRIMARY KEY,
-    participant_type ENUM('Athlete', 'GameTeam'),
-    participant_title VARCHAR(255) NOT NULL,
-    country_code CHAR(3),
-    FOREIGN KEY (country_code) REFERENCES countries(country_code),
-    UNIQUE KEY uk_participant (participant_type, participant_title, country_code)
+-- 5. athletes (from athletes.csv)
+CREATE TABLE athletes (
+    athlete_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    country_id INT,
+    FOREIGN KEY (country_id) REFERENCES countries(country_id)
 );
 
--- 6. medals
-CREATE TABLE medals (
-    medal_id INT AUTO_INCREMENT PRIMARY KEY,
-    game_slug VARCHAR(50),
-    event_id INT,
-    participant_id INT,
-    medal_type ENUM('Gold', 'Silver', 'Bronze') NOT NULL,
-    FOREIGN KEY (game_slug) REFERENCES olympics(game_slug),
-    FOREIGN KEY (event_id) REFERENCES events(event_id),
-    FOREIGN KEY (participant_id) REFERENCES participants(participant_id)
-);
-
--- 7. results
+-- 6. results (from results.csv)
 CREATE TABLE results (
-    result_id INT AUTO_INCREMENT PRIMARY KEY,
-    game_slug VARCHAR(50),
-    discipline_title VARCHAR(100),
-    event_title VARCHAR(255),
-    participant_type ENUM('Athlete', 'GameTeam'),
-    country_code CHAR(3),
-    medal_type ENUM('Gold', 'Silver', 'Bronze', 'None') DEFAULT 'None',
-    rank_position VARCHAR(10),
-    value_type VARCHAR(50) NULL,
-    value_unit VARCHAR(50) NULL,
-    FOREIGN KEY (game_slug) REFERENCES olympics(game_slug),
-    FOREIGN KEY (discipline_title) REFERENCES disciplines(discipline_title),
-    FOREIGN KEY (country_code) REFERENCES countries(country_code),
-    INDEX idx_game_country (game_slug, country_code)
+    result_id INT PRIMARY KEY,
+    athlete_id INT,
+    event_id INT,
+    olympic_id INT,
+    medal ENUM('Gold', 'Silver', 'Bronze', 'None') DEFAULT 'None',
+    FOREIGN KEY (athlete_id) REFERENCES athletes(athlete_id),
+    FOREIGN KEY (event_id) REFERENCES events(event_id),
+    FOREIGN KEY (olympic_id) REFERENCES olympics(olympic_id)
 );
 
--- 8. medal_summary
+-- 7. medal_summary (from medal_summary.csv)
 CREATE TABLE medal_summary (
-    summary_id INT AUTO_INCREMENT PRIMARY KEY,
-    country_code CHAR(3),
-    game_slug VARCHAR(50),
+    summary_id INT AUTO_INCREMENT PRIMARY KEY, 
+    country_id INT,
+    olympic_id INT,
+    bronze INT DEFAULT 0,
     gold INT DEFAULT 0,
     silver INT DEFAULT 0,
-    bronze INT DEFAULT 0,
     total INT DEFAULT 0,
-    FOREIGN KEY (country_code) REFERENCES countries(country_code),
-    FOREIGN KEY (game_slug) REFERENCES olympics(game_slug),
-    UNIQUE KEY uk_summary (country_code, game_slug)
+    FOREIGN KEY (country_id) REFERENCES countries(country_id),
+    FOREIGN KEY (olympic_id) REFERENCES olympics(olympic_id),
+    UNIQUE KEY uk_summary (country_id, olympic_id)
 );
 
--- 9. users
+-- 8. users (App Table)
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE,
     password VARCHAR(255),
-    country_focus CHAR(3),
-    FOREIGN KEY (country_focus) REFERENCES countries(country_code)
+    country_focus INT, 
+    FOREIGN KEY (country_focus) REFERENCES countries(country_id) 
 );
