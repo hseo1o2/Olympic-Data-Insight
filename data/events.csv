@@ -212,20 +212,20 @@ event_id,sport_id,name
 211,7,125km mass start women
 212,7,75km women
 213,7,125km pursuit men
-214,1,Men Men's 1500m
-215,1,Women Women's 1000m
-216,1,Women Women's 1500m
-217,1,Men Men's Mass Start
-218,1,Men Men's 500m
-219,1,Men Men
-220,1,Women LadiesMass Start
-221,1,Men Mens 500m
+214,1,Men's 1500m
+215,1,Women's 1000m
+216,1,Women's 1500m
+217,1,Men's Mass Start
+218,1,Men's 500m
+219,1,Men
+220,1,Women Ladies Mass Start
+221,1,Men's 500m
 222,1,Women Ladies500m
-223,1,Men Mens 1500m
-224,1,Men Mens 1000m
-225,1,Men Mens Mass Start
-226,1,Men Mens Parallel Giant Slalom
-227,1,Women Ladies1500m
+223,1,Men's 1500m
+224,1,Men's 1000m
+225,1,Men's Mass Start
+226,1,Men's Parallel Giant Slalom
+227,1,Women Ladies 1500m
 228,1,Women 500m women
 229,1,Women 1000m women
 230,1,Women 1500m women
