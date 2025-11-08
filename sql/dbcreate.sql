@@ -1,78 +1,75 @@
--- @author: 김서연 
+-- @author: 김서연
 
 DROP DATABASE IF EXISTS team02;
 CREATE DATABASE team02 CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE team02;
+SET FOREIGN_KEY_CHECKS = 0;
 
--- 1. countries (from countries.csv)
-CREATE TABLE countries (
-    country_id INT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    continent_name VARCHAR(50)
+-- 1. Dimension 테이블
+CREATE TABLE leagues (
+    league_id INT AUTO_INCREMENT PRIMARY KEY,
+    league_name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- 2. olympics (from olympics.csv)
-CREATE TABLE olympics (
-    olympic_id INT PRIMARY KEY,
-    year INT,
-    city VARCHAR(100),
-    slug VARCHAR(50)
+CREATE TABLE seasons (
+    season_id INT AUTO_INCREMENT PRIMARY KEY,
+    season_name VARCHAR(20) UNIQUE NOT NULL
 );
 
--- 3. sports (from sports.csv)
-CREATE TABLE sports (
-    sport_id INT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    category VARCHAR(100)
+CREATE TABLE teams (
+    team_id INT AUTO_INCREMENT PRIMARY KEY,
+    team_name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- 4. events (from events.csv)
-CREATE TABLE events (
-    event_id INT PRIMARY KEY,
-    sport_id INT,
-    name VARCHAR(255), 
-    FOREIGN KEY (sport_id) REFERENCES sports(sport_id)
+CREATE TABLE referees (
+    referee_id INT AUTO_INCREMENT PRIMARY KEY,
+    referee_name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- 5. athletes (from athletes.csv)
-CREATE TABLE athletes (
-    athlete_id INT PRIMARY KEY,
-    name VARCHAR(255),
-    country_id INT,
-    FOREIGN KEY (country_id) REFERENCES countries(country_id)
+CREATE TABLE players (
+    player_id INT AUTO_INCREMENT PRIMARY KEY,
+    player_name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- 6. results (from results.csv)
-CREATE TABLE results (
-    result_id INT PRIMARY KEY,
-    athlete_id INT,
-    event_id INT,
-    olympic_id INT,
-    medal ENUM('Gold', 'Silver', 'Bronze', 'None') DEFAULT 'None',
-    FOREIGN KEY (athlete_id) REFERENCES athletes(athlete_id),
-    FOREIGN KEY (event_id) REFERENCES events(event_id),
-    FOREIGN KEY (olympic_id) REFERENCES olympics(olympic_id)
+-- 2. Fact 테이블
+CREATE TABLE matches (
+    match_id INT AUTO_INCREMENT PRIMARY KEY,
+    league_id INT,
+    season_id INT,
+    match_date DATE,
+    home_team_id INT,
+    away_team_id INT,
+    home_goals INT,
+    away_goals INT,
+    referee_id INT,
+    venue VARCHAR(255),
+    attendance VARCHAR(50),
+    FOREIGN KEY (league_id) REFERENCES leagues(league_id),
+    FOREIGN KEY (season_id) REFERENCES seasons(season_id),
+    FOREIGN KEY (home_team_id) REFERENCES teams(team_id),
+    FOREIGN KEY (away_team_id) REFERENCES teams(team_id),
+    FOREIGN KEY (referee_id) REFERENCES referees(referee_id)
 );
 
--- 7. medal_summary (from medal_summary.csv)
-CREATE TABLE medal_summary (
-    summary_id INT AUTO_INCREMENT PRIMARY KEY, 
-    country_id INT,
-    olympic_id INT,
-    bronze INT DEFAULT 0,
-    gold INT DEFAULT 0,
-    silver INT DEFAULT 0,
-    total INT DEFAULT 0,
-    FOREIGN KEY (country_id) REFERENCES countries(country_id),
-    FOREIGN KEY (olympic_id) REFERENCES olympics(olympic_id),
-    UNIQUE KEY uk_summary (country_id, olympic_id)
+CREATE TABLE match_events (
+    event_id INT AUTO_INCREMENT PRIMARY KEY,
+    match_id INT,
+    team_id INT,
+    player_id INT,
+    assist_player_id INT,
+    minute INT,
+    event_type VARCHAR(50), 
+    FOREIGN KEY (match_id) REFERENCES matches(match_id),
+    FOREIGN KEY (team_id) REFERENCES teams(team_id),
+    FOREIGN KEY (player_id) REFERENCES players(player_id),
+    FOREIGN KEY (assist_player_id) REFERENCES players(player_id)
 );
 
--- 8. users (App Table)
+-- 3. App 테이블
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE,
-    password VARCHAR(255),
-    country_focus INT, 
-    FOREIGN KEY (country_focus) REFERENCES countries(country_id) 
+    password VARCHAR(255)
 );
+
+SET FOREIGN_KEY_CHECKS = 1;
