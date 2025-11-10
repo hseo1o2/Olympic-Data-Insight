@@ -58,14 +58,14 @@ CREATE TABLE match_events (
     player_id INT,
     assist_player_id INT,
     minute INT,
-    event_type VARCHAR(50),
+    event_type VARCHAR(50), 
     FOREIGN KEY (match_id) REFERENCES matches(match_id),
     FOREIGN KEY (team_id) REFERENCES teams(team_id),
     FOREIGN KEY (player_id) REFERENCES players(player_id),
     FOREIGN KEY (assist_player_id) REFERENCES players(player_id)
 );
 
--- 3. App 테이블 
+-- 3. App 테이블
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) UNIQUE,

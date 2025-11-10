@@ -82,25 +82,28 @@ SELECT
     r.referee_id,
     s.venue,
     s.attendance
-FROM staging_summary s
+FROM staging_summary s 
 LEFT JOIN teams ht ON s.home = ht.team_name
 LEFT JOIN teams at ON s.away = at.team_name
 LEFT JOIN referees r ON s.referee = r.referee_name;
 
 
--- 5. match_events 테이블 삽입
+-- 5. match_events 테이블 삽입 
 INSERT INTO match_events (match_id, team_id, player_id, assist_player_id, minute, event_type)
 SELECT
     m.match_id,
     t.team_id,
     p.player_id,
-    ap.player_id, 
+    ap.player_id,
     s.minute,
     s.event_type
 FROM staging_events s
-LEFT JOIN matches m ON STR_TO_DATE(s.match_date, '%Y-%m-%d') = m.match_date
-LEFT JOIN teams ht ON m.home_team_id = ht.team_id AND s.home = ht.team_name
-LEFT JOIN teams at ON m.away_team_id = at.team_id AND s.away = at.team_name
+
+JOIN teams ht ON s.home = ht.team_name
+JOIN teams at ON s.away = at.team_name
+JOIN matches m ON m.match_date = STR_TO_DATE(s.match_date, '%Y-%m-%d')
+                AND m.home_team_id = ht.team_id
+                AND m.away_team_id = at.team_id
 LEFT JOIN teams t ON s.team = t.team_name
 LEFT JOIN players p ON s.player = p.player_name
 LEFT JOIN players ap ON s.assist = ap.player_name;
@@ -110,7 +113,7 @@ LEFT JOIN players ap ON s.assist = ap.player_name;
 DROP TABLE IF EXISTS staging_summary;
 DROP TABLE IF EXISTS staging_events;
 
--- 7. 테스트 사용자 삽입 
+-- 7. 테스트 사용자 삽입 (admin 권한)
 INSERT INTO users (username, password, role) VALUES
 ('team02', 'team02', 'admin');
 
