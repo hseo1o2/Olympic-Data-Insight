@@ -21,7 +21,7 @@ function isAdmin(): bool {
 // 로그인 강제 (비로그인 시 login.php 이동)
 function requireLogin(): void {
     if (!isLoggedIn()) {
-        header("Location: /team02/login.php");  // 절대경로로 수정
+        header("Location: /team02/auth/login.php");  // 절대경로로 수정
         exit;
     }
 }

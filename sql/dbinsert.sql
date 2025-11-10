@@ -36,6 +36,7 @@ CREATE TABLE staging_events (
 
 -- 2. CSV 파일 로드 
 LOAD DATA INFILE 'C:\\xampp\\team02\\data\\summary.csv'
+-- 맥: LOAD DATA INFILE '/Applications/XAMPP/htdocs/team02/data/summary.csv'
 INTO TABLE staging_summary
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' ENCLOSED BY '"'
@@ -43,6 +44,7 @@ LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
 LOAD DATA INFILE 'C:\\xampp\\team02\\data\\events.csv'
+-- 맥: LOAD DATA INFILE '/Applications/XAMPP/htdocs/team02/data/events.csv'
 INTO TABLE staging_events
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' ENCLOSED BY '"'

@@ -28,6 +28,10 @@
         <a href="/team02/crud/teams.php">Teams</a> |
         <a href="/team02/crud/players.php">Players</a> |
         <a href="/team02/crud/matches.php">Matches</a> |
+        <a href="/team02/analysis/rollup_goals.php">Rollup</a> |
+        <a href="/team02/analysis/window_moving_avg.php">Moving Avg</a> |
+        <a href="/team02/analysis/transaction_demo.php">Transaction</a> |
+
         <a href="/team02/auth/logout.php" style="color:red;">Logout</a>
     </nav>
 </header>
