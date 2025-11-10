@@ -1,5 +1,4 @@
 -- @author: 김서연
-
 USE team02;
 SET FOREIGN_KEY_CHECKS = 0;
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -35,7 +34,7 @@ CREATE TABLE staging_events (
     attendance VARCHAR(50)
 );
 
--- 2. 새 CSV 2개 로드 
+-- 2. CSV 파일 로드 
 LOAD DATA INFILE 'C:\\xampp\\team02\\data\\summary.csv'
 INTO TABLE staging_summary
 CHARACTER SET utf8mb4
@@ -50,8 +49,7 @@ FIELDS TERMINATED BY ',' ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-
--- 3. Dimension 테이블 삽입 
+-- 3. Dimension 테이블 삽입
 INSERT IGNORE INTO leagues (league_name) VALUES ('Premier League');
 INSERT IGNORE INTO seasons (season_name) VALUES ('24-25');
 
@@ -67,7 +65,6 @@ INSERT IGNORE INTO players (player_name)
 SELECT DISTINCT player FROM staging_events WHERE player IS NOT NULL AND player != ''
 UNION
 SELECT DISTINCT assist FROM staging_events WHERE assist IS NOT NULL AND assist != '';
-
 
 -- 4. Fact 테이블 삽입
 INSERT INTO matches (league_id, season_id, match_date, home_team_id, away_team_id, home_goals, away_goals, referee_id, venue, attendance)
@@ -87,8 +84,7 @@ LEFT JOIN teams ht ON s.home = ht.team_name
 LEFT JOIN teams at ON s.away = at.team_name
 LEFT JOIN referees r ON s.referee = r.referee_name;
 
-
--- 5. match_events 테이블 삽입 
+-- 5. 이벤트 테이블 삽입
 INSERT INTO match_events (match_id, team_id, player_id, assist_player_id, minute, event_type)
 SELECT
     m.match_id,
@@ -98,7 +94,6 @@ SELECT
     s.minute,
     s.event_type
 FROM staging_events s
-
 JOIN teams ht ON s.home = ht.team_name
 JOIN teams at ON s.away = at.team_name
 JOIN matches m ON m.match_date = STR_TO_DATE(s.match_date, '%Y-%m-%d')
@@ -108,15 +103,12 @@ LEFT JOIN teams t ON s.team = t.team_name
 LEFT JOIN players p ON s.player = p.player_name
 LEFT JOIN players ap ON s.assist = ap.player_name;
 
-
--- 6. 임시 테이블 삭제
+-- 6. 스테이징 테이블 삭제
 DROP TABLE IF EXISTS staging_summary;
 DROP TABLE IF EXISTS staging_events;
 
--- 7. 테스트 사용자 삽입 (admin 권한)
-INSERT INTO users (username, password, role) VALUES
-('team02', 'team02', 'admin');
+-- 7. 관리자 계정 생성
+INSERT INTO users (username, password, role) VALUES ('team02', 'team02', 'admin');
 
--- 마무리
 COMMIT;
 SET FOREIGN_KEY_CHECKS = 1;
