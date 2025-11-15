@@ -1,4 +1,9 @@
 <?php
+$labels = ['2020', '2021', '2022'];
+$values = [30, 25, 50];
+?>
+
+<?php
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 requireLogin();
@@ -24,5 +29,60 @@ include 'partials/header.php';
     <em>Chart visualization area (to be implemented)</em>
   </div>
 </div>
+
+<!-- 메달(=득점) 비율 도넛 -->
+<section class="card">
+  <h3>Team Goals Ratio (League/Season)</h3>
+  <div style="max-width:720px">
+    <canvas id="chMedalRatio" height="220"></canvas>
+  </div>
+</section>
+
+<!-- 연도별 성과 라인 -->
+<section class="card">
+  <h3>Yearly Performance – Avg Goals per Match</h3>
+  <div style="max-width:720px">
+    <canvas id="chYearlyLine" height="220"></canvas>
+  </div>
+</section>
+
+<script>
+(async () => {
+  // 필요시 드롭다운에서 읽어옴 (없다면 null로 유지)
+  const leagueId = $('#selLeague')?.value || null; // 선택 요소가 있다면 id 맞춰 쓰기
+  const seasonId = $('#selSeason')?.value || null;
+
+  // 1) 득점 비율(도넛)
+  {
+    const url = new URL('/api/dashboard_medal_ratio.php', location.origin);
+    if (leagueId) url.searchParams.set('league_id', leagueId);
+    if (seasonId) url.searchParams.set('season_id', seasonId);
+    url.searchParams.set('limit', '7');
+
+    const { rows } = await fetch(url).then(r=>r.json());
+    const labels = labelsOf(rows, 'team');
+    const data   = numsOf(rows, 'goals');
+
+    mkChart('#chMedalRatio', 'doughnut', labels, [
+      { label:'Goals', data }
+    ]);
+  }
+
+  // 2) 연도(시즌)별 평균 득점 라인
+  {
+    const url = new URL('/api/dashboard_yearly_performance.php', location.origin);
+    if (leagueId) url.searchParams.set('league_id', leagueId);
+
+    const { rows } = await fetch(url).then(r=>r.json());
+    const labels = labelsOf(rows, 'season_name');
+    const data   = numsOf(rows, 'avg_goals');
+
+    mkChart('#chYearlyLine', 'line', labels, [
+      { label:'Avg Goals per Match', data, tension: .3 }
+    ], { scales:{ y:{ beginAtZero:true } } });
+  }
+})();
+</script>
+
 
 <?php include 'partials/footer.php'; ?>

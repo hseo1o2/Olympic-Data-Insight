@@ -21,16 +21,16 @@
     </h2>
 
     <nav>
-        <a href="/team02/index.php">Dashboard</a> |
-        <a href="/team02/introduce.php">Introduce</a> |
-        <a href="/team02/analysis/ranking_teams.php">Team Ranking</a> |
-        <a href="/team02/analysis/ranking_players.php">Player Ranking</a> |
-        <a href="/team02/crud/teams.php">Teams</a> |
-        <a href="/team02/crud/players.php">Players</a> |
-        <a href="/team02/crud/matches.php">Matches</a> |
-        <a href="/team02/analysis/rollup_goals.php">Rollup</a> |
-        <a href="/team02/analysis/window_moving_avg.php">Moving Avg</a> |
-        <a href="/team02/analysis/transaction_demo.php">Transaction</a> |
+        <a href="/Olympic-Data-Insight/team02/index.php">Dashboard</a> |
+        <a href="/Olympic-Data-Insight/team02/introduce.php">Introduce</a> |
+        <a href="/Olympic-Data-Insight/team02/analysis/ranking_teams.php">Team Ranking</a> |
+        <a href="/Olympic-Data-Insight/team02/analysis/ranking_players.php">Player Ranking</a> |
+        <a href="/Olympic-Data-Insight/team02/crud/teams.php">Teams</a> |
+        <a href="/Olympic-Data-Insight/team02/crud/players.php">Players</a> |
+        <a href="/Olympic-Data-Insight/team02/crud/matches.php">Matches</a> |
+        <a href="/Olympic-Data-Insight/team02/analysis/rollup_goals.php">Rollup</a> |
+        <a href="/Olympic-Data-Insight/team02/analysis/window_moving_avg.php">Moving Avg</a> |
+        <a href="/Olympic-Data-Insight/team02/analysis/transaction_demo.php">Transaction</a> |
 
         <a href="/team02/auth/logout.php" style="color:red;">Logout</a>
     </nav>
