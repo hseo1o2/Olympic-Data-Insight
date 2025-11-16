@@ -10,16 +10,6 @@ $isAdmin = isAdmin();
 // 관리자 전용 CRUD
 if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // 팀 추가
-    if (isset($_POST['add_team'])) {
-        $name = trim($_POST['team_name']);
-        if ($name !== '') {
-            $stmt = $pdo->prepare("INSERT INTO teams (team_name) VALUES (:n)");
-            $stmt->execute([':n' => $name]);
-            echo "<p style='color:green;text-align:center;'>✅ Team added successfully!</p>";
-        }
-    }
-
     // 팀 수정
     if (isset($_POST['edit_team'])) {
         $id = $_POST['team_id'];
@@ -69,10 +59,11 @@ table {
 th { background-color:#1d3557;color:white;padding:10px; }
 td { text-align:center;padding:9px;border-bottom:1px solid #eee; }
 tr:hover { background-color:#f2f6fb; }
+
 button { padding:6px 10px;border:none;border-radius:5px;cursor:pointer; }
 .edit-btn { background-color:#457b9d;color:white; }
 .del-btn { background-color:#e63946;color:white; }
-.add-btn { background-color:#1d3557;color:white;margin-bottom:15px; }
+
 .modal {
   display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%;
   background:rgba(0,0,0,0.5); justify-content:center; align-items:center;
@@ -85,19 +76,13 @@ button { padding:6px 10px;border:none;border-radius:5px;cursor:pointer; }
 
 <h3>⚽ Team Management</h3>
 
-<!-- 관리자 전용: 추가 버튼 -->
-<?php if ($isAdmin): ?>
-<div style="text-align:center;">
-  <button class="add-btn" onclick="openAddModal()">＋ Add Team</button>
-</div>
-<?php endif; ?>
-
 <table>
   <tr>
     <th>No.</th>
     <th>Team Name</th>
     <?php if ($isAdmin): ?><th>Actions</th><?php endif; ?>
   </tr>
+
   <?php foreach ($teams as $t): ?>
   <tr>
     <td><?= $t['team_id'] ?></td>
@@ -106,9 +91,14 @@ button { padding:6px 10px;border:none;border-radius:5px;cursor:pointer; }
         <?= htmlspecialchars($t['team_name']) ?>
       </a>
     </td>
+
     <?php if ($isAdmin): ?>
     <td>
-      <button class="edit-btn" onclick="openEditModal(<?= $t['team_id'] ?>, '<?= htmlspecialchars($t['team_name'], ENT_QUOTES) ?>')">✏️ Edit</button>
+      <button class="edit-btn"
+        onclick="openEditModal(<?= $t['team_id'] ?>, '<?= htmlspecialchars($t['team_name'], ENT_QUOTES) ?>')">
+        ✏️ Edit
+      </button>
+
       <button class="del-btn" onclick="openDeleteModal(<?= $t['team_id'] ?>)">🗑 Delete</button>
     </td>
     <?php endif; ?>
@@ -118,18 +108,6 @@ button { padding:6px 10px;border:none;border-radius:5px;cursor:pointer; }
 
 <!-- 모달 섹션 -->
 <?php if ($isAdmin): ?>
-
-<!-- Add Modal -->
-<div id="addModal" class="modal">
-  <div class="modal-content">
-    <h4>➕ Add Team</h4>
-    <form method="POST">
-      <input type="text" name="team_name" placeholder="Team name..." required><br>
-      <button type="submit" name="add_team">Add</button>
-      <button type="button" onclick="closeModal('addModal')">Cancel</button>
-    </form>
-  </div>
-</div>
 
 <!-- Edit Modal -->
 <div id="editModal" class="modal">
@@ -145,7 +123,7 @@ button { padding:6px 10px;border:none;border-radius:5px;cursor:pointer; }
 </div>
 
 <!-- Delete Modal -->
-<div id="deleteModal" class="modal">
+<div id="deleteModal"class="modal">
   <div class="modal-content">
     <h4>🗑 Delete Team</h4>
     <p>Are you sure you want to delete this team?</p>
@@ -160,9 +138,6 @@ button { padding:6px 10px;border:none;border-radius:5px;cursor:pointer; }
 <?php endif; ?>
 
 <script>
-function openAddModal() {
-  document.getElementById('addModal').style.display = 'flex';
-}
 function openEditModal(id, name) {
   document.getElementById('edit_id').value = id;
   document.getElementById('edit_name').value = name;
