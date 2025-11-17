@@ -1,17 +1,42 @@
-<!-- partials/header.php -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Team02 - Football Performance Insight</title>
+
+    <!-- Chart.js (전역 1회 로드) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Chart Helper -->
+    <script>
+        function $(selector) { return document.querySelector(selector); }
+
+        function mkChart(sel, type, labels, datasets, opt = {}) {
+            const el = $(sel);
+            if (!el) return;
+
+            const ctx = el.getContext("2d");
+            return new Chart(ctx, {
+                type,
+                data: { labels, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    ...opt
+                }
+            });
+        }
+    </script>
+
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color:#f9fafb; }
         header { padding: 10px; border-bottom: 2px solid #1d3557; margin-bottom: 20px; }
         nav a { margin-right: 15px; text-decoration:none; color:#1d3557; font-weight:bold; }
         nav a:hover { color:#457b9d; }
-        .admin-tag { color:#e63946; font-weight:bold; font-size:14px; margin-left:8px; }
+        .admin-tag { color:#e63946; font-weight:bold; margin-left:8px; }
     </style>
 </head>
+
 <body>
 <header>
     <h2>⚽ Football Performance Insight 
@@ -31,7 +56,6 @@
         <a href="/Olympic-Data-Insight/team02/analysis/rollup_goals.php">Rollup</a> |
         <a href="/Olympic-Data-Insight/team02/analysis/window_moving_avg.php">Moving Avg</a> |
         <a href="/Olympic-Data-Insight/team02/analysis/transaction_demo.php">Transaction</a> |
-
         <a href="/team02/auth/logout.php" style="color:red;">Logout</a>
     </nav>
 </header>

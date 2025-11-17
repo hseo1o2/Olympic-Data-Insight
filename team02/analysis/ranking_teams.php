@@ -11,7 +11,8 @@ SELECT
         CASE 
             WHEN (m.home_team_id = t.team_id AND m.home_goals > m.away_goals) THEN 3
             WHEN (m.away_team_id = t.team_id AND m.away_goals > m.home_goals) THEN 3
-            WHEN (m.home_goals = m.away_goals AND (m.home_team_id = t.team_id OR m.away_team_id = t.team_id)) THEN 1
+            WHEN (m.home_goals = m.away_goals 
+               AND (m.home_team_id = t.team_id OR m.away_team_id = t.team_id)) THEN 1
             ELSE 0
         END
     ) AS points
@@ -21,6 +22,7 @@ LEFT JOIN matches m
 GROUP BY t.team_id, t.team_name
 ORDER BY points DESC
 ";
+
 $rows = $pdo->query($sql)->fetchAll();
 ?>
 
@@ -45,37 +47,57 @@ tr:nth-child(even) { background-color: #f6f8fa; }
 tr:nth-child(odd) { background-color: #ffffff; }
 tr:hover { background-color: #edf2f7; }
 
-.top1 td {
-  font-weight: 700;
-  color: #1d3557;
-}
-
-.caption {
-  text-align: center; color: #6c757d; font-size: 14px; margin-top: 15px;
-}
+.top1 td { font-weight: 700; color: #1d3557; }
+.caption { text-align: center; color: #6c757d; font-size: 14px; margin-top: 15px; }
 </style>
 
 <h3>🏅 Premier League 24–25 — Team Ranking by Points</h3>
 
 <table>
-  <tr>
-    <th>Rank</th>
-    <th>Team</th>
-    <th>Points</th>
-  </tr>
-  <?php 
-  $rank = 1;
-  foreach($rows as $r): 
-      $rowClass = ($rank == 1) ? 'top1' : '';
-  ?>
-  <tr class="<?= $rowClass ?>">
-    <td><?= $rank ?></td>
-    <td><?= htmlspecialchars($r['team']) ?></td>
-    <td><?= $r['points'] ?? 0 ?></td>
-  </tr>
-  <?php $rank++; endforeach; ?>
+<tr>
+  <th>Rank</th>
+  <th>Team</th>
+  <th>Points</th>
+</tr>
+
+<?php $i = 1; ?>
+<?php foreach($rows as $r): ?>
+<tr class="<?= ($i==1 ? 'top1' : '') ?>">
+  <td><?= $i ?></td>
+  <td><?= htmlspecialchars($r['team']) ?></td>
+  <td><?= $r['points'] ?? 0 ?></td>
+</tr>
+<?php $i++; endforeach; ?>
 </table>
 
-<p class="caption">🏆 Ranking is based on match data (3 pts win, 1 pt draw, 0 pt loss)</p>
+<p class="caption">🏆 Ranking based on 3/1/0 point system.</p>
 
-<?php include '../partials/footer.php'; ?>
+<!-- 📊 Chart.js Team Rank (수정된 부분) -->
+<div style="width:70%; max-width:900px; margin:30px auto; height:450px;">
+    <canvas id="chartTeamRank"></canvas>
+</div>
+
+<script>
+// 데이터 직렬화 그대로 유지
+const teamRankLabels = <?= json_encode(array_map(fn($r)=> $r['team'], $rows)) ?>;
+const teamPoints     = <?= json_encode(array_map(fn($r)=> intval($r['points']), $rows)) ?>;
+
+// 차트 실행
+mkChart("#chartTeamRank", "bar",
+  teamRankLabels,
+  [{
+    label: "Points",
+    data: teamPoints,
+    backgroundColor: "rgba(255,159,64,0.4)",
+    borderColor: "rgba(255,159,64,1)",
+    borderWidth: 1
+  }],
+  {
+    indexAxis: "y",
+    plugins:{ title:{ display:true, text:"Team Points Ranking" }},
+    scales: { x: { beginAtZero: true } }
+  }
+);
+</script>
+
+<?php include '../partials/footer.php'; ?>   <!-- ⭐ 맨 마지막에 와야 함 -->

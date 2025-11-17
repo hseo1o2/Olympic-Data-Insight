@@ -27,23 +27,48 @@ $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
 <table border='1' cellpadding='8' cellspacing='0'
        style='margin:auto; width:60%; text-align:center; background:white;'>
-    <tr style='background:#1d3557; color:white;'>
-        <th>Team</th>
-        <th>Total Goals</th>
-    </tr>
+<tr style='background:#1d3557; color:white;'>
+    <th>Team</th>
+    <th>Total Goals</th>
+</tr>
 
-    <?php foreach ($rows as $row): ?>
-        <?php
-        // NULL → ROLLUP의 TOTAL 행 변환
-        $team = $row['team'] ?? 'TOTAL';
-        ?>
-        <tr>
-            <td><b><?= htmlspecialchars($team) ?></b></td>
-            <td><?= $row['total_goals'] ?></td>
-        </tr>
-    <?php endforeach; ?>
+<?php foreach ($rows as $row): ?>
+    <?php $team = $row['team'] ?? 'TOTAL'; ?>
+    <tr>
+        <td><b><?= htmlspecialchars($team) ?></b></td>
+        <td><?= $row['total_goals'] ?></td>
+    </tr>
+<?php endforeach; ?>
 </table>
 
 <p style='text-align:center; color:#6c757d;'>* Based on match_events goal events (GROUP BY ... WITH ROLLUP)</p>
+
+
+<!-- 📊 Chart.js ROLLUP (수정된 부분) -->
+<div style="width:70%; max-width:900px; margin:30px auto; height:420px;">
+    <canvas id="chartRollup"></canvas>
+</div>
+
+<script>
+const rollupLabels = <?= json_encode(array_map(fn($r)=> $r['team'] ?? "TOTAL", $rows)) ?>;
+const rollupData   = <?= json_encode(array_map(fn($r)=> intval($r['total_goals']), $rows)) ?>;
+
+mkChart("#chartRollup", "bar",
+  rollupLabels,
+  [{
+    label: "Total Goals",
+    data: rollupData,
+    backgroundColor: "rgba(54,162,235,0.4)",
+    borderColor: "rgba(54,162,235,1)",
+    borderWidth: 1
+  }],
+  {
+    plugins: { title:{ display:true, text:"ROLLUP: Total Goals by Team" }},
+    scales: { 
+        y:{ beginAtZero:true }
+    }
+  }
+);
+</script>
 
 <?php include '../partials/footer.php'; ?>

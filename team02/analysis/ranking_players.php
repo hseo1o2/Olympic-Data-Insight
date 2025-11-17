@@ -82,8 +82,33 @@ switch ($r['ranking']) {
 
 <p class="notice">
   * Includes <b>goal</b> and <b>penalty_goal</b> events only.<br>
-  * Excludes <i>penalty_miss</i> or any non-scoring events.<br>
-  * Uses <b>RANK() OVER (ORDER BY COUNT(event_id) DESC)</b> for ranking.
+  * Uses <b>RANK() OVER</b> for ranking.
 </p>
+
+<!-- 📊 Chart.js Ranking (수정된 부분) -->
+<div style="width:70%; max-width:900px; margin:30px auto; height:450px;">
+    <canvas id="chartPlayerRank"></canvas>
+</div>
+
+<script>
+const rankLabels = <?= json_encode(array_map(fn($r)=> $r['player_name'], $rows)) ?>;
+const rankGoals  = <?= json_encode(array_map(fn($r)=> intval($r['total_goals']), $rows)) ?>;
+
+mkChart("#chartPlayerRank", "bar",
+  rankLabels,
+  [{
+    label: "Goals",
+    data: rankGoals,
+    backgroundColor: "rgba(153,102,255,0.4)",
+    borderColor: "rgba(153,102,255,1)",
+    borderWidth: 1
+  }],
+  {
+    indexAxis: "y",
+    plugins:{ title:{ display:true, text:"Top Scorers Ranking" }},
+    scales: { x: { beginAtZero:true } }
+  }
+);
+</script>
 
 <?php include '../partials/footer.php'; ?>

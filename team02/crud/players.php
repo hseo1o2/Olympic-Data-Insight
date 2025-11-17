@@ -4,21 +4,45 @@ require_once '../includes/auth.php';
 requireLogin();
 include '../partials/header.php';
 
-// 관리자 여부 확인
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+/* -------------------------------------------------------
+   🔒 isAdmin()이 auth.php 안에 없을 경우 대비한 fallback
+------------------------------------------------------- */
+if (!function_exists('isAdmin')) {
+    function isAdmin() {
+        return isset($_SESSION['user']) &&
+               isset($_SESSION['user']['role']) &&
+               $_SESSION['user']['role'] === 'admin';
+    }
+}
+
+/* -------------------------------------------------------
+   관리자 여부 확인
+------------------------------------------------------- */
 $isAdmin = isAdmin();
 
-// 페이지네이션
+/* -------------------------------------------------------
+   페이지네이션
+------------------------------------------------------- */
 $perPage = 30;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-// 팀 목록
+/* -------------------------------------------------------
+   팀 목록
+------------------------------------------------------- */
 $teams = $pdo->query("SELECT team_id, team_name FROM teams ORDER BY team_name")->fetchAll();
 
-// 팀별 필터
+/* -------------------------------------------------------
+   팀별 필터
+------------------------------------------------------- */
 $selectedTeam = isset($_GET['team_id']) ? (int)$_GET['team_id'] : 0;
 
-// 총 플레이어 수
+/* -------------------------------------------------------
+   총 플레이어 수
+------------------------------------------------------- */
 if ($selectedTeam > 0) {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM players WHERE team_id=:tid");
     $stmt->execute([':tid' => $selectedTeam]);
@@ -28,7 +52,9 @@ if ($selectedTeam > 0) {
 }
 $totalPages = ceil($total / $perPage);
 
-// 플레이어 목록
+/* -------------------------------------------------------
+   플레이어 목록
+------------------------------------------------------- */
 if ($selectedTeam > 0) {
     $sql = "
         SELECT p.player_id, p.player_name, p.team_id, t.team_name
@@ -53,7 +79,9 @@ $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $players = $stmt->fetchAll();
 
-// 관리자 전용 CRUD
+/* -------------------------------------------------------
+   관리자 전용 CRUD
+------------------------------------------------------- */
 if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 추가
@@ -140,9 +168,31 @@ tr:hover { background-color:#f2f6fb; }
 </div>
 <?php endif; ?>
 
+<?php
+// 🔎 캡션용 텍스트 계산 (옛날 PHP도 안전하게)
+$captionText = "Showing all players";
+if ($selectedTeam) {
+    $teamNameMap = array();
+    foreach ($teams as $t) {
+        $teamNameMap[$t['team_id']] = $t['team_name'];
+    }
+    if (isset($teamNameMap[$selectedTeam])) {
+        $captionText = "Showing players from <b>" . htmlspecialchars($teamNameMap[$selectedTeam]) . "</b>";
+    }
+}
+?>
 <p class="caption">
-  <?= $selectedTeam ? "Showing players from <b>".htmlspecialchars(array_column($teams,'team_name','team_id')[$selectedTeam])."</b>" : "Showing all players" ?>
-  — Page <?= $page ?> of <?= $totalPages ?> (<?= $total ?> total)
+<?php 
+$teamNames = array_column($teams, 'team_name', 'team_id');
+
+if ($selectedTeam && isset($teamNames[$selectedTeam])) {
+    echo "Showing players from <b>" . htmlspecialchars($teamNames[$selectedTeam]) . "</b>";
+} else {
+    echo "Showing all players";
+}
+
+echo " — Page {$page} of {$totalPages} ({$total} total)";
+?>
 </p>
 
 <table>
@@ -242,8 +292,8 @@ function openEditModal(id, name, currentTeamId) {
   document.getElementById('edit_id').value = id;
   document.getElementById('edit_name').value = name;
 
-  const teamSelect = document.getElementById('edit_team');
-  for (let i = 0; i < teamSelect.options.length; i++) {
+  var teamSelect = document.getElementById('edit_team');
+  for (var i = 0; i < teamSelect.options.length; i++) {
     if (parseInt(teamSelect.options[i].value) === currentTeamId) {
       teamSelect.selectedIndex = i;
       break;
