@@ -4,11 +4,10 @@ require_once '../includes/auth.php';
 requireLogin();
 include '../partials/header.php';
 
-$isAdmin = isAdmin();
+$isAdmin = isAdmin(); // 관리자 여부 확인
 
-// -----------------------------
-// Load Match
-// -----------------------------
+
+// 경기 정보 로드
 $match_id = $_GET['match_id'] ?? null;
 if (!$match_id) {
     echo "<h2 style='text-align:center;color:red;'>Invalid match ID</h2>";
@@ -36,76 +35,103 @@ if (!$match) {
     exit;
 }
 
-// Load Players
+// 선수 목록 로드
 $players = $pdo->query("SELECT player_id, team_id, player_name FROM players ORDER BY player_name")->fetchAll(PDO::FETCH_ASSOC);
 
-// -----------------------------
-// POST: Add Event
-// -----------------------------
+
+// Add Event (관리자 전용 + 트랜잭션)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_event']) && $isAdmin) {
-    $team = $_POST['team_id'];
-    $player = $_POST['player_id'];
-    $type = $_POST['event_type'];
-    $minute = $_POST['minute'];
-    $assist = ($_POST['assist_player_id'] ?? null) ?: null;
 
-    $stmt = $pdo->prepare("
-        INSERT INTO match_events (match_id, team_id, player_id, assist_player_id, minute, event_type)
-        VALUES (:mid, :tid, :pid, :aid, :min, :etype)
-    ");
-    $stmt->execute([
-        ':mid'=>$match_id, ':tid'=>$team, ':pid'=>$player, ':aid'=>$assist,
-        ':min'=>$minute, ':etype'=>$type
-    ]);
+    try {
+        $pdo->beginTransaction();  // 트랜잭션 시작
 
-    updateMatchScore($pdo, $match_id);
-    header("Location: edit_matches.php?match_id=$match_id#events"); // ← 수정됨
+        $team = $_POST['team_id'];
+        $player = $_POST['player_id'];
+        $type = $_POST['event_type'];
+        $minute = $_POST['minute'];
+        $assist = ($_POST['assist_player_id'] ?? null) ?: null;
+
+        $stmt = $pdo->prepare("
+            INSERT INTO match_events (match_id, team_id, player_id, assist_player_id, minute, event_type)
+            VALUES (:mid, :tid, :pid, :aid, :min, :etype)
+        ");
+        $stmt->execute([
+            ':mid'=>$match_id, ':tid'=>$team, ':pid'=>$player, ':aid'=>$assist,
+            ':min'=>$minute, ':etype'=>$type
+        ]);
+
+        updateMatchScore($pdo, $match_id);
+
+        $pdo->commit(); // 트랜잭션 성공 시 반영
+
+    } catch (Exception $e) {
+        $pdo->rollBack(); // 실패 시 롤백
+        echo "<p style='color:red;text-align:center;'>Error: ".$e->getMessage()."</p>";
+    }
+
+    header("Location: edit_matches.php?match_id=$match_id#events");
     exit;
 }
-
-// -----------------------------
-// POST: Edit Event
-// -----------------------------
+// Edit Event (관리자 전용 + 트랜잭션)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_event']) && $isAdmin) {
-    $eid = $_POST['event_id'];
-    $team = $_POST['team_id'];
-    $player = $_POST['player_id'];
-    $type = $_POST['event_type'];
-    $minute = $_POST['minute'];
-    $assist = ($_POST['assist_player_id'] ?? null) ?: null;
 
-    $stmt = $pdo->prepare("
-        UPDATE match_events
-        SET team_id=:tid, player_id=:pid, assist_player_id=:aid, minute=:min, event_type=:etype
-        WHERE event_id=:eid
-    ");
-    $stmt->execute([
-        ':tid'=>$team, ':pid'=>$player, ':aid'=>$assist,
-        ':min'=>$minute, ':etype'=>$type, ':eid'=>$eid
-    ]);
+    try {
+        $pdo->beginTransaction();
 
-    updateMatchScore($pdo, $match_id);
-    header("Location: edit_matches.php?match_id=$match_id#events"); // ← 수정됨
+        $eid = $_POST['event_id'];
+        $team = $_POST['team_id'];
+        $player = $_POST['player_id'];
+        $type = $_POST['event_type'];
+        $minute = $_POST['minute'];
+        $assist = ($_POST['assist_player_id'] ?? null) ?: null;
+
+        $stmt = $pdo->prepare("
+            UPDATE match_events
+            SET team_id=:tid, player_id=:pid, assist_player_id=:aid, minute=:min, event_type=:etype
+            WHERE event_id=:eid
+        ");
+        $stmt->execute([
+            ':tid'=>$team, ':pid'=>$player, ':aid'=>$assist,
+            ':min'=>$minute, ':etype'=>$type, ':eid'=>$eid
+        ]);
+
+        updateMatchScore($pdo, $match_id);
+
+        $pdo->commit();
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo "<p style='color:red;text-align:center;'>Error: ".$e->getMessage()."</p>";
+    }
+
+    header("Location: edit_matches.php?match_id=$match_id#events");
     exit;
 }
 
-// -----------------------------
-// POST: Delete Event
-// -----------------------------
+// Delete Event (관리자 전용 + 트랜잭션)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_event']) && $isAdmin) {
-    $eid = $_POST['event_id'];
 
-    $stmt = $pdo->prepare("DELETE FROM match_events WHERE event_id=:eid");
-    $stmt->execute([':eid'=>$eid]);
+    try {
+        $pdo->beginTransaction();
 
-    updateMatchScore($pdo, $match_id);
-    header("Location: edit_matches.php?match_id=$match_id#events"); // ← 수정됨
+        $eid = $_POST['event_id'];
+
+        $stmt = $pdo->prepare("DELETE FROM match_events WHERE event_id=:eid");
+        $stmt->execute([':eid'=>$eid]);
+
+        updateMatchScore($pdo, $match_id);
+
+        $pdo->commit();
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        echo "<p style='color:red;text-align:center;'>Error: ".$e->getMessage()."</p>";
+    }
+
+    header("Location: edit_matches.php?match_id=$match_id#events");
     exit;
 }
-
-// -----------------------------
-// Load Events
-// -----------------------------
+//  이벤트 리스트 로드
 $stmt = $pdo->prepare("
     SELECT me.*, t.team_name, 
            p.player_name,
@@ -120,10 +146,9 @@ $stmt = $pdo->prepare("
 $stmt->execute([':mid'=>$match_id]);
 $events = $stmt->fetchAll();
 
-// -----------------------------
-// Auto Score Update
-// -----------------------------
+// 득점 자동 업데이트 함수
 function updateMatchScore($pdo, $match_id) {
+
     $stmt = $pdo->prepare("SELECT team_id, event_type FROM match_events WHERE match_id=:mid");
     $stmt->execute([':mid'=>$match_id]);
     $rows = $stmt->fetchAll();
@@ -148,104 +173,20 @@ function updateMatchScore($pdo, $match_id) {
     ]);
 }
 ?>
-
 <style>
-.container {
-    max-width: 900px;
-    margin: 40px auto;
-}
+.container { max-width: 900px; margin: 40px auto; }
+.card-box { background:#fff; padding:25px 28px; border-radius:14px; box-shadow:0 4px 16px rgba(0,0,0,0.07); margin-bottom:35px; }
+h2 { font-weight:700; }
+table { width:100%; border-collapse:collapse; border-radius:12px; overflow:hidden; }
+th { background:#457b9d; padding:10px; color:#fff; }
+td { padding:10px; border-bottom:1px solid #eee; text-align:center; }
+button.edit { background:#2a9d8f; color:#fff; }
+button.delete { background:#e63946; color:#fff; }
+tr:hover td { background:#f8f9fa; }
+.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; }
+.modal-box { width:400px; background:#fff; padding:25px; border-radius:14px; }
+.add-event-form {display: flex;flex-wrap: wrap;gap: 12px;align-items: center;justify-content: center; }
 
-.card-box {
-    background: #ffffff;
-    padding: 25px 28px;
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-    margin-bottom: 35px;
-}
-
-h2 {
-    font-weight: 700;
-    margin-bottom: 5px;
-}
-
-h3 {
-    font-weight: 700;
-    margin-bottom: 18px;
-}
-
-label {
-    font-weight: 600;
-    margin-bottom: 4px;
-    display: block;
-}
-
-select, input[type="number"] {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background: #fff;
-    margin-bottom: 15px;
-}
-
-button {
-    border: none;
-    border-radius: 6px;
-    padding: 9px 14px;
-    cursor: pointer;
-    font-weight: 600;
-}
-
-button.edit {
-    background: #2a9d8f;
-    color: #fff;
-}
-
-button.delete {
-    background: #e63946;
-    color: #fff;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-top: 10px;
-}
-
-th {
-    background: #457b9d;
-    padding: 10px;
-    color: #fff;
-}
-
-td {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-    text-align: center;
-}
-
-tr:hover td {
-    background: #f8f9fa;
-}
-
-.modal {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-box {
-    width: 400px;
-    background: #fff;
-    padding: 25px;
-    border-radius: 14px;
-}
 </style>
 
 <div class="container">
@@ -257,13 +198,15 @@ tr:hover td {
     Date: <?= $match['match_date'] ?> · Referee: <?= $match['referee_name'] ?>
 </p>
 
-
-<!-- ADD EVENT -->
-<div class="card-box">
-    <h3>Add Event</h3>
-
+<!-- ------------------------------------------
+     ADD EVENT (관리자만 보임)
+------------------------------------------- -->
 <?php if ($isAdmin): ?>
-<form method="POST">
+<div class="card-box">
+    <h3 style="text-align:center;">Add Event</h3>
+
+<form method="POST" class="add-event-form">
+
 
     <label>Team</label>
     <select name="team_id" id="team_select" required>
@@ -298,13 +241,15 @@ tr:hover td {
 
     <button type="submit" name="add_event" class="edit">Add Event</button>
 </form>
-<?php endif; ?>
 </div>
+<?php endif; ?>
 
 
-<!-- EVENT LIST -->
+<!-- ------------------------------------------
+     EVENT LIST 
+------------------------------------------- -->
 <div class="card-box">
-    <h3>Event List</h3>
+    <h3 style="text-align:center;">Event List</h3>
 
     <table>
         <tr>
@@ -313,7 +258,10 @@ tr:hover td {
             <th>Player</th>
             <th>Assist</th>
             <th>Type</th>
-            <th>Actions</th>
+
+            <?php if ($isAdmin): ?>
+                <th>Actions</th>
+            <?php endif; ?>
         </tr>
 
 <?php foreach ($events as $e): ?>
@@ -323,7 +271,10 @@ tr:hover td {
             <td><?= htmlspecialchars($e['player_name']) ?></td>
             <td><?= htmlspecialchars($e['assist_name'] ?? '-') ?></td>
             <td><?= htmlspecialchars($e['event_type']) ?></td>
+
+            <?php if ($isAdmin): ?>
             <td>
+                <!-- 관리자 전용 Edit 버튼 -->
                 <button class="edit"
                     onclick="openEditModal(
                         <?= $e['event_id'] ?>,
@@ -340,6 +291,7 @@ tr:hover td {
                     <button class="delete" name="delete_event">Delete</button>
                 </form>
             </td>
+            <?php endif; ?>
         </tr>
 <?php endforeach; ?>
 
@@ -349,7 +301,10 @@ tr:hover td {
 </div>
 
 
-<!-- MODAL -->
+<!-- ------------------------------------------
+     EDIT MODAL (관리자 전용)
+------------------------------------------- -->
+<?php if ($isAdmin): ?>
 <div id="editModal" class="modal">
     <div class="modal-box">
         <h3>Edit Event</h3>
@@ -390,12 +345,23 @@ tr:hover td {
         </form>
     </div>
 </div>
-
+<?php endif; ?>
 
 <script>
 const players = <?= json_encode($players) ?>;
 
-document.getElementById("team_select").addEventListener("change", function() {
+// Assist 표시/숨김
+function updateAssistVisibility() {
+    const type = document.getElementById("type_select")?.value;
+    document.getElementById("assist_wrapper").style.display =
+        (type === "goal" || type === "penalty_goal") ? "block" : "none";
+}
+document.getElementById("type_select")?.addEventListener("change", updateAssistVisibility);
+updateAssistVisibility();
+
+// 팀 선택 → 선수 목록 업데이트
+document.getElementById("team_select")?.addEventListener("change", function () {
+
     const tid = this.value;
     const pSel = document.getElementById("player_select");
     const aSel = document.getElementById("assist_select");
@@ -405,37 +371,47 @@ document.getElementById("team_select").addEventListener("change", function() {
 
     if (!tid) {
         pSel.disabled = true;
+        aSel.disabled = true;
         return;
     }
 
     const teamPlayers = players.filter(p => p.team_id == tid);
-    pSel.disabled = false;
 
+    pSel.disabled = false;  
+    aSel.disabled = false;  
+
+    // 선수 목록 채우기
     teamPlayers.forEach(p => {
         pSel.innerHTML += `<option value="${p.player_id}">${p.player_name}</option>`;
     });
 
-    pSel.addEventListener("change", function() {
-        const scorer = this.value;
+    // assist 초기화
+    aSel.innerHTML = "<option value=''>None</option>";
+});
 
-        aSel.innerHTML = "<option value=''>None</option>";
-        teamPlayers.forEach(p => {
-            if (p.player_id != scorer) {
-                aSel.innerHTML += `<option value="${p.player_id}">${p.player_name}</option>`;
-            }
-        });
+-
+// 선수 선택 → assist 목록 업데이트
+document.getElementById("player_select")?.addEventListener("change", function () {
+    const scorer = this.value;
+    const tid = document.getElementById("team_select").value;
+    const aSel = document.getElementById("assist_select");
+
+    if (!tid) return;
+
+    const teamPlayers = players.filter(p => p.team_id == tid);
+
+    aSel.disabled = false; 
+
+    aSel.innerHTML = "<option value=''>None</option>";
+
+    teamPlayers.forEach(p => {
+        if (p.player_id != scorer) {
+            aSel.innerHTML += `<option value="${p.player_id}">${p.player_name}</option>`;
+        }
     });
 });
 
-function updateAssistVisibility() {
-    const type = document.getElementById("type_select").value;
-    document.getElementById("assist_wrapper").style.display =
-        (type === "goal" || type === "penalty_goal") ? "block" : "none";
-}
-document.getElementById("type_select").addEventListener("change", updateAssistVisibility);
-updateAssistVisibility();
-
-
+// EDIT MODAL (기존 그대로 유지)
 function openEditModal(eid, teamId, playerId, type, minute, assistId) {
     document.getElementById("editModal").style.display = "flex";
 
@@ -468,7 +444,7 @@ function openEditModal(eid, teamId, playerId, type, minute, assistId) {
     document.getElementById("edit_assist_wrapper").style.display =
         (type === "goal" || type === "penalty_goal") ? "block" : "none";
 
-    typeSel.addEventListener("change", function() {
+    typeSel.addEventListener("change", function () {
         document.getElementById("edit_assist_wrapper").style.display =
             (this.value === "goal" || this.value === "penalty_goal") ? "block" : "none";
     });
@@ -479,4 +455,3 @@ function closeEditModal() {
 }
 </script>
 
-<?php include '../partials/footer.php'; ?>
