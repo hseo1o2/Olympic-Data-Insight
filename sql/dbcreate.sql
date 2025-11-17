@@ -123,4 +123,10 @@ CREATE TABLE staging_events (
 
 SET FOREIGN_KEY_CHECKS = 1;
 
+-- ---------------------------
+-- 5. Indexes 
+-- ---------------------------
+CREATE INDEX idx_players_team_id ON players(team_id);
+CREATE INDEX idx_events_match_id ON match_events(match_id);
+
 COMMIT;
