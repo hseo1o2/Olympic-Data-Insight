@@ -411,7 +411,7 @@ document.getElementById("player_select")?.addEventListener("change", function ()
     });
 });
 
-// EDIT MODAL (기존 그대로 유지)
+// EDIT MODAL 
 function openEditModal(eid, teamId, playerId, type, minute, assistId) {
     document.getElementById("editModal").style.display = "flex";
 
