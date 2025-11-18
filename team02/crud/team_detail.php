@@ -12,6 +12,17 @@ if (!$tid) {
     exit;
 }
 
+// 사용자 입력 (필터)
+$type = $_GET['type'] ?? 'all';
+
+// 동적 SQL 조건 생성
+$extra = "";
+if ($type === "home") {
+    $extra = " AND m.home_team_id = t.team_id ";
+} elseif ($type === "away") {
+    $extra = " AND m.away_team_id = t.team_id ";
+}
+
 // 팀 분석 쿼리 실행
 $sql = "
 SELECT 
@@ -30,8 +41,10 @@ SELECT
 FROM matches m
 JOIN teams t ON (m.home_team_id = t.team_id OR m.away_team_id = t.team_id)
 WHERE t.team_id = :tid
+$extra
 GROUP BY t.team_name;
 ";
+
 $stmt = $pdo->prepare($sql);
 $stmt->execute([':tid' => $tid]);
 $team = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -82,9 +95,28 @@ td {
 .back a:hover {
   color: #e63946;
 }
+.filter-box {
+  text-align:center;
+  margin-bottom:20px;
+}
 </style>
 
 <div class="container">
+
+<!-- 필터 UI  -->
+<form method="GET" class="filter-box">
+    <input type="hidden" name="team_id" value="<?= $tid ?>">
+    
+    <label><b>Match Type:</b></label>
+    <select name="type">
+        <option value="all" <?= ($type === 'all') ? 'selected' : '' ?>>All</option>
+        <option value="home" <?= ($type === 'home') ? 'selected' : '' ?>>Home Only</option>
+        <option value="away" <?= ($type === 'away') ? 'selected' : '' ?>>Away Only</option>
+    </select>
+
+    <button type="submit" style="padding:6px 12px; margin-left:10px;">Apply</button>
+</form>
+
 <?php if ($team): ?>
   <h2>🏟 <?= htmlspecialchars($team['team_name']) ?> — Team Summary</h2>
   <table>
@@ -103,6 +135,7 @@ td {
   <div class="back">
     <a href="../crud/teams.php">← Back to Team List</a>
   </div>
+
 </div>
 
 <?php include '../partials/footer.php'; ?>
