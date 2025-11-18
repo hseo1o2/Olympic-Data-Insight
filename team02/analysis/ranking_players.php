@@ -4,6 +4,10 @@ require_once '../includes/auth.php';
 requireLogin();
 include '../partials/header.php';
 
+// 사용자 입력을 통해 팀 필터링 처리
+$teamFilter = isset($_GET['team']) ? $_GET['team'] : '';
+
+// SQL 쿼리
 $sql = "
 SELECT 
     p.player_name,
@@ -12,14 +16,37 @@ SELECT
     RANK() OVER (ORDER BY COUNT(*) DESC) AS ranking
 FROM match_events e
 JOIN players p ON e.player_id = p.player_id
-JOIN teams t ON e.team_id = t.team_id  
+JOIN teams t ON e.team_id = t.team_id
 WHERE e.event_type IN ('goal', 'penalty_goal')
-GROUP BY p.player_id, p.player_name, t.team_name
-ORDER BY ranking;
 ";
 
-$rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+// 팀명이 입력된 경우, 팀 이름을 조건에 추가
+if ($teamFilter) {
+    $sql .= " AND t.team_name LIKE :team";
+}
+
+$sql .= " GROUP BY p.player_id, p.player_name, t.team_name
+          ORDER BY ranking";
+
+// PreparedStatement로 쿼리 실행
+$stmt = $pdo->prepare($sql);
+
+// 팀명 필터링이 있으면 바인딩
+if ($teamFilter) {
+    $stmt->bindValue(':team', '%' . $teamFilter . '%');
+}
+
+// 쿼리 실행
+$stmt->execute();
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
+<!-- 팀 필터링 폼 -->
+<form method="GET" style="display: flex; justify-content: center; align-items: center; flex-direction: column; margin-top: 20px; text-align: center;">
+    <label for="team" style="font-size: 16px; margin-bottom: 10px;">Filter by Team Name:</label>
+    <input type="text" id="team" name="team" placeholder="Enter team name" style="padding: 8px 12px; font-size: 14px; width: 250px;">
+    <button type="submit" style="margin-top: 10px; padding: 8px 15px; font-size: 14px; background-color: #1d3557; color: white; border: none; border-radius: 4px;">Filter</button>
+</form>
 
 <style>
 body { font-family: 'Segoe UI', Arial, sans-serif; background-color:#f8fafc; color:#222; }
@@ -85,7 +112,7 @@ switch ($r['ranking']) {
   * Uses <b>RANK() OVER</b> for ranking.
 </p>
 
-<!-- 📊 Chart.js Ranking (수정된 부분) -->
+<!-- 📊 Chart.js Ranking -->
 <div style="width:70%; max-width:900px; margin:30px auto; height:450px;">
     <canvas id="chartPlayerRank"></canvas>
 </div>
