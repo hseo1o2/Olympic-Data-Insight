@@ -4,6 +4,9 @@ require_once '../includes/auth.php';
 requireLogin();
 include '../partials/header.php';
 
+/* ------------------------
+   ROLLUP 데이터 조회 (PreparedStatement)
+------------------------- */
 $sql = "
 SELECT *
 FROM (
@@ -12,7 +15,7 @@ FROM (
         COUNT(*) AS total_goals
     FROM match_events me
     JOIN teams t ON me.team_id = t.team_id
-    WHERE me.event_type LIKE '%goal%'
+    WHERE me.event_type LIKE :etype
     GROUP BY t.team_name WITH ROLLUP
 ) AS sub
 ORDER BY 
@@ -20,10 +23,13 @@ ORDER BY
     total_goals DESC;
 ";
 
-$rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $pdo->prepare($sql);
+$stmt->execute([":etype" => "%goal%"]);
+$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
-<h3 style='text-align:center; color:#1d3557;'>⚽ Total Goals by Team (Event-based ROLLUP)</h3>
+<h3 style='text-align:center; color:#1d3557;'>⚽ Total Goals by Team (ROLLUP + Drill Down)</h3>
 
 <table border='1' cellpadding='8' cellspacing='0'
        style='margin:auto; width:60%; text-align:center; background:white;'>
@@ -33,18 +39,29 @@ $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 </tr>
 
 <?php foreach ($rows as $row): ?>
-    <?php $team = $row['team'] ?? 'TOTAL'; ?>
+    <?php 
+    $team = $row['team'] ?? 'TOTAL';
+    $isTotal = is_null($row['team']);
+    ?>
     <tr>
-        <td><b><?= htmlspecialchars($team) ?></b></td>
+        <td>
+            <?php if (!$isTotal): ?>
+                <a href="team_goal_details.php?team=<?= urlencode($team) ?>">
+                    <b><?= htmlspecialchars($team) ?></b>
+                </a>
+            <?php else: ?>
+                <b><?= htmlspecialchars($team) ?></b>
+            <?php endif; ?>
+        </td>
         <td><?= $row['total_goals'] ?></td>
     </tr>
 <?php endforeach; ?>
 </table>
 
-<p style='text-align:center; color:#6c757d;'>* Based on match_events goal events (GROUP BY ... WITH ROLLUP)</p>
+<p style='text-align:center; color:#6c757d;'>* Click a team to drill down into detailed goal events.</p>
 
 
-<!-- 📊 Chart.js ROLLUP (수정된 부분) -->
+<!-- Chart.js -->
 <div style="width:70%; max-width:900px; margin:30px auto; height:420px;">
     <canvas id="chartRollup"></canvas>
 </div>
