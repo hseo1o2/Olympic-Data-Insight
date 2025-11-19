@@ -112,7 +112,7 @@ switch ($r['ranking']) {
   * Uses <b>RANK() OVER</b> for ranking.
 </p>
 
-<!-- 📊 Chart.js Ranking -->
+<!-- Chart.js -->
 <div style="width:70%; max-width:900px; margin:30px auto; height:450px;">
     <canvas id="chartPlayerRank"></canvas>
 </div>

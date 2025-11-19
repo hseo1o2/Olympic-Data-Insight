@@ -1,7 +1,5 @@
 <?php
-// ================================
 // AUTHENTICATION & ACCESS CONTROL 
-// ================================
 
 // 세션 시작 (중복 방지)
 if (session_status() === PHP_SESSION_NONE) {
@@ -21,7 +19,7 @@ function isAdmin(): bool {
 // 로그인 강제 (비로그인 시 login.php 이동)
 function requireLogin(): void {
     if (!isLoggedIn()) {
-        header("Location: /team02/auth/login.php");  // 절대경로로 수정
+        header("Location: /team02/auth/login.php");
         exit;
     }
 }

@@ -2,7 +2,7 @@
 // api/dashboard_yearly_performance.php
 require_once __DIR__ . '/../includes/db.php';
 
-$league = $_GET['league_id'] ?? null; // 선택사항
+$league = $_GET['league_id'] ?? null;
 
 // 시즌(연도)별 평균 득점(리그 전체)
 $sql = "

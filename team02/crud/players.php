@@ -7,9 +7,7 @@ include '../partials/header.php';
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-/* -------------------------------------------------------
-   🔒 isAdmin()이 auth.php 안에 없을 경우 대비한 fallback
-------------------------------------------------------- */
+// isAdmin()이 auth.php 안에 없을 경우 대비한 fallback */
 if (!function_exists('isAdmin')) {
     function isAdmin() {
         return isset($_SESSION['user']) &&
@@ -18,31 +16,21 @@ if (!function_exists('isAdmin')) {
     }
 }
 
-/* -------------------------------------------------------
-   관리자 여부 확인
-------------------------------------------------------- */
+// 관리자 여부 확인
 $isAdmin = isAdmin();
 
-/* -------------------------------------------------------
-   페이지네이션
-------------------------------------------------------- */
+// 페이지네이션
 $perPage = 30;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $perPage;
 
-/* -------------------------------------------------------
-   팀 목록
-------------------------------------------------------- */
+// 팀 목록
 $teams = $pdo->query("SELECT team_id, team_name FROM teams ORDER BY team_name")->fetchAll();
 
-/* -------------------------------------------------------
-   팀별 필터
-------------------------------------------------------- */
+// 팀별 필터
 $selectedTeam = isset($_GET['team_id']) ? (int)$_GET['team_id'] : 0;
 
-/* -------------------------------------------------------
-   총 플레이어 수
-------------------------------------------------------- */
+// 총 플레이어 수
 if ($selectedTeam > 0) {
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM players WHERE team_id=:tid");
     $stmt->execute([':tid' => $selectedTeam]);
@@ -52,9 +40,7 @@ if ($selectedTeam > 0) {
 }
 $totalPages = ceil($total / $perPage);
 
-/* -------------------------------------------------------
-   플레이어 목록
-------------------------------------------------------- */
+// 플레이어 목록
 if ($selectedTeam > 0) {
     $sql = "
         SELECT p.player_id, p.player_name, p.team_id, t.team_name
@@ -79,12 +65,9 @@ $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 $stmt->execute();
 $players = $stmt->fetchAll();
 
-/* -------------------------------------------------------
-   관리자 전용 CRUD
-------------------------------------------------------- */
+// 관리자 전용 CRUD
 if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // 추가
     if (isset($_POST['add_player'])) {
         $name = trim($_POST['player_name']);
         $team = $_POST['team_id'];
@@ -169,7 +152,7 @@ tr:hover { background-color:#f2f6fb; }
 <?php endif; ?>
 
 <?php
-// 🔎 캡션용 텍스트 계산 (옛날 PHP도 안전하게)
+// 캡션용 텍스트 계산 (옛날 PHP도 안전하게)
 $captionText = "Showing all players";
 if ($selectedTeam) {
     $teamNameMap = array();

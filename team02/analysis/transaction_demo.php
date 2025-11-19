@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("DELETE FROM matches WHERE match_id=?")->execute([$matchId]);
 
         $pdo->commit();
-        $msg = "✅ Match & related events deleted successfully!";
+        $msg = "Match & related events deleted successfully!";
     } catch (Exception $e) {
         $pdo->rollBack();
         $msg = "❌ Error occurred, rollback executed";

@@ -13,9 +13,7 @@ if (!$teamName) {
     exit;
 }
 
-/* -------------------------------
-   팀 ID 가져오기 (PreparedStatement)
--------------------------------- */
+// 팀 ID 가져오기
 $qTeam = $pdo->prepare("SELECT team_id FROM teams WHERE team_name = :tname");
 $qTeam->execute([":tname" => $teamName]);
 $teamRow = $qTeam->fetch();
@@ -28,9 +26,7 @@ if (!$teamRow) {
 
 $tid = $teamRow['team_id'];
 
-/* -------------------------------
-   골 이벤트 상세 요청 (Drill Down)
--------------------------------- */
+// Goal Event 상세 요청
 $sql = "
 SELECT 
     me.minute,

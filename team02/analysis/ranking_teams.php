@@ -72,17 +72,15 @@ tr:hover { background-color: #edf2f7; }
 
 <p class="caption">🏆 Ranking based on 3/1/0 point system.</p>
 
-<!-- 📊 Chart.js Team Rank (수정된 부분) -->
+<!-- Chart.js -->
 <div style="width:70%; max-width:900px; margin:30px auto; height:450px;">
     <canvas id="chartTeamRank"></canvas>
 </div>
 
 <script>
-// 데이터 직렬화 그대로 유지
 const teamRankLabels = <?= json_encode(array_map(fn($r)=> $r['team'], $rows)) ?>;
 const teamPoints     = <?= json_encode(array_map(fn($r)=> intval($r['points']), $rows)) ?>;
 
-// 차트 실행
 mkChart("#chartTeamRank", "bar",
   teamRankLabels,
   [{
@@ -100,4 +98,4 @@ mkChart("#chartTeamRank", "bar",
 );
 </script>
 
-<?php include '../partials/footer.php'; ?>   <!-- ⭐ 맨 마지막에 와야 함 -->
+<?php include '../partials/footer.php'; ?>

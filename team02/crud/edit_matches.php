@@ -198,9 +198,8 @@ tr:hover td { background:#f8f9fa; }
     Date: <?= $match['match_date'] ?> · Referee: <?= $match['referee_name'] ?>
 </p>
 
-<!-- ------------------------------------------
-     ADD EVENT (관리자만 보임)
-------------------------------------------- -->
+<!-- ADD EVENT (관리자만 보임) -->
+
 <?php if ($isAdmin): ?>
 <div class="card-box">
     <h3 style="text-align:center;">Add Event</h3>
@@ -245,9 +244,7 @@ tr:hover td { background:#f8f9fa; }
 <?php endif; ?>
 
 
-<!-- ------------------------------------------
-     EVENT LIST 
-------------------------------------------- -->
+<!-- EVENT LIST -->
 <div class="card-box">
     <h3 style="text-align:center;">Event List</h3>
 
@@ -301,9 +298,7 @@ tr:hover td { background:#f8f9fa; }
 </div>
 
 
-<!-- ------------------------------------------
-     EDIT MODAL (관리자 전용)
-------------------------------------------- -->
+<!-- EDIT MODAL (관리자 전용) -->
 <?php if ($isAdmin): ?>
 <div id="editModal" class="modal">
     <div class="modal-box">

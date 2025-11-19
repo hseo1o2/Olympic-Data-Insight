@@ -85,7 +85,7 @@ $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <p style='text-align:center;color:#6c757d;'>* Uses ROWS BETWEEN 4 PRECEDING AND CURRENT ROW</p>
 
 
-<!-- 📊 Chart.js Windowing -->
+<!-- Chart.js -->
 <?php if (!empty($selectedTeam)): ?>
     <div style="width:70%; max-width:900px; margin:30px auto; height:420px;">
         <canvas id="chartWindow"></canvas>

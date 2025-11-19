@@ -4,9 +4,7 @@ require_once '../includes/auth.php';
 requireLogin();
 include '../partials/header.php';
 
-/* ------------------------
-   ROLLUP 데이터 조회 (PreparedStatement)
-------------------------- */
+// Rollup 데이터 조회
 $sql = "
 SELECT *
 FROM (
