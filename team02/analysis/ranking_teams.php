@@ -6,24 +6,30 @@ include '../partials/header.php';
 
 $sql = "
 SELECT 
-    t.team_name AS team,
-    SUM(
-        CASE 
-            WHEN (m.home_team_id = t.team_id AND m.home_goals > m.away_goals) THEN 3
-            WHEN (m.away_team_id = t.team_id AND m.away_goals > m.home_goals) THEN 3
-            WHEN (m.home_goals = m.away_goals 
-               AND (m.home_team_id = t.team_id OR m.away_team_id = t.team_id)) THEN 1
-            ELSE 0
-        END
-    ) AS points
-FROM teams t
-LEFT JOIN matches m 
-  ON (t.team_id = m.home_team_id OR t.team_id = m.away_team_id)
-GROUP BY t.team_id, t.team_name
-ORDER BY points DESC
+    team,
+    points,
+    RANK() OVER (ORDER BY points DESC) AS ranking
+FROM (
+    SELECT 
+        t.team_name AS team,
+        SUM(
+            CASE 
+                WHEN (m.home_team_id = t.team_id AND m.home_goals > m.away_goals) THEN 3
+                WHEN (m.away_team_id = t.team_id AND m.away_goals > m.home_goals) THEN 3
+                WHEN (m.home_goals = m.away_goals 
+                    AND (m.home_team_id = t.team_id OR m.away_team_id = t.team_id)) THEN 1
+                ELSE 0
+            END
+        ) AS points
+    FROM teams t
+    LEFT JOIN matches m 
+      ON (t.team_id = m.home_team_id OR t.team_id = m.away_team_id)
+    GROUP BY t.team_id, t.team_name
+) AS sub
+ORDER BY points DESC;
 ";
 
-$rows = $pdo->query($sql)->fetchAll();
+$rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <style>
@@ -60,17 +66,16 @@ tr:hover { background-color: #edf2f7; }
   <th>Points</th>
 </tr>
 
-<?php $i = 1; ?>
 <?php foreach($rows as $r): ?>
-<tr class="<?= ($i==1 ? 'top1' : '') ?>">
-  <td><?= $i ?></td>
+<tr class="<?= ($r['ranking'] == 1 ? 'top1' : '') ?>">
+  <td><?= $r['ranking'] ?></td>
   <td><?= htmlspecialchars($r['team']) ?></td>
   <td><?= $r['points'] ?? 0 ?></td>
 </tr>
-<?php $i++; endforeach; ?>
+<?php endforeach; ?>
 </table>
 
-<p class="caption">🏆 Ranking based on 3/1/0 point system.</p>
+<p class="caption">🏆 Ranking calculated using the 3/1/0 point system and SQL RANK() window function.</p>
 
 <!-- Chart.js -->
 <div style="width:70%; max-width:900px; margin:30px auto; height:450px;">
@@ -99,3 +104,4 @@ mkChart("#chartTeamRank", "bar",
 </script>
 
 <?php include '../partials/footer.php'; ?>
+
