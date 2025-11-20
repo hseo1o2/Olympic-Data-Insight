@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // 기본 역할: user
             $stmt = $pdo->prepare("
                 INSERT INTO users (username, password, role)
-                VALUES (:u, :p, 'user')
+                VALUES (:u, :p, 'viewer')
             ");
             $stmt->execute([':u' => $username, ':p' => $hash]);
 
@@ -110,3 +110,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p>Already have an account? <a href="login.php">Login here</a></p>
 </body>
 </html>
+
