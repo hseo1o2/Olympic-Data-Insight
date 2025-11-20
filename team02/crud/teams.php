@@ -87,7 +87,7 @@ button { padding:6px 10px;border:none;border-radius:5px;cursor:pointer; }
   <tr>
     <td><?= $t['team_id'] ?></td>
     <td>
-      <a href="team_detail.php?team_id=<?= $t['team_id'] ?>" style="color:#1d3557; text-decoration:none;">
+      <a href="../analysis/team_detail.php?team_id=<?= $t['team_id'] ?>" style="color:#1d3557; text-decoration:none;">
         <?= htmlspecialchars($t['team_name']) ?>
       </a>
     </td>
@@ -153,3 +153,4 @@ function closeModal(id) {
 </script>
 
 <?php include '../partials/footer.php'; ?>
+
