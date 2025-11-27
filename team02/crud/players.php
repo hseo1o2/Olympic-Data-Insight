@@ -74,7 +74,9 @@ if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($name !== '' && $team) {
             $stmt = $pdo->prepare("INSERT INTO players (player_name, team_id) VALUES (:n, :t)");
             $stmt->execute([':n' => $name, ':t' => $team]);
-            echo "<p style='color:green;text-align:center;'>✅ Player added successfully!</p>";
+            $_SESSION['flash_message'] = "✅ Player added successfully!";
+            header("Location: players.php?team_id={$selectedTeam}&page={$page}");
+            exit;
         }
     }
 
@@ -85,15 +87,33 @@ if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $team = $_POST['team_id'];
         $stmt = $pdo->prepare("UPDATE players SET player_name=:n, team_id=:t WHERE player_id=:id");
         $stmt->execute([':n' => $name, ':t' => $team, ':id' => $id]);
-        echo "<p style='color:blue;text-align:center;'>✏️ Player updated successfully!</p>";
+        $_SESSION['flash_message'] = "✏️ Player updated successfully!";
+        header("Location: players.php?team_id={$selectedTeam}&page={$page}");
+        exit;
     }
 
     // 삭제
     if (isset($_POST['delete_player'])) {
         $id = $_POST['player_id'];
+
+        // 1) match_events 삭제
+        $stmt = $pdo->prepare("
+            DELETE FROM match_events
+            WHERE player_id = :id
+            OR assist_player_id = :id
+        ");
+        $stmt->execute([':id' => $id]);
+
+        // 2) players 삭제
         $stmt = $pdo->prepare("DELETE FROM players WHERE player_id=:id");
         $stmt->execute([':id' => $id]);
-        echo "<p style='color:red;text-align:center;'>🗑 Player deleted successfully!</p>";
+
+        // 플래시 메시지 등록
+        $_SESSION['flash_message'] = "🗑 Player deleted successfully!";
+
+        // 새로고침
+        header("Location: players.php?team_id={$selectedTeam}&page={$page}");
+        exit;
     }
 }
 ?>
@@ -131,6 +151,14 @@ tr:hover { background-color:#f2f6fb; }
 
 <h3>👟 Player Management</h3>
 
+<!-- 🔥 플래시 메시지 표시 -->
+<?php if (isset($_SESSION['flash_message'])): ?>
+  <p style="color:red; text-align:center; font-weight:bold; margin-top:10px;">
+    <?= $_SESSION['flash_message'] ?>
+  </p>
+  <?php unset($_SESSION['flash_message']); ?>
+<?php endif; ?>
+
 <!-- 팀별 필터 -->
 <form method="GET">
   <label for="team_id">Team:</label>
@@ -144,36 +172,17 @@ tr:hover { background-color:#f2f6fb; }
   </select>
 </form>
 
-<!-- 관리자 전용: 추가 버튼 -->
-<?php if ($isAdmin): ?>
-<div style="text-align:center;margin-bottom:10px;">
-  <button onclick="openAddModal()">＋ Add Player</button>
-</div>
-<?php endif; ?>
-
 <?php
-// 캡션용 텍스트 계산 (옛날 PHP도 안전하게)
-$captionText = "Showing all players";
-if ($selectedTeam) {
-    $teamNameMap = array();
-    foreach ($teams as $t) {
-        $teamNameMap[$t['team_id']] = $t['team_name'];
-    }
-    if (isset($teamNameMap[$selectedTeam])) {
-        $captionText = "Showing players from <b>" . htmlspecialchars($teamNameMap[$selectedTeam]) . "</b>";
-    }
-}
+// 캡션 텍스트
+$teamNames = array_column($teams, 'team_name', 'team_id');
 ?>
 <p class="caption">
 <?php 
-$teamNames = array_column($teams, 'team_name', 'team_id');
-
 if ($selectedTeam && isset($teamNames[$selectedTeam])) {
     echo "Showing players from <b>" . htmlspecialchars($teamNames[$selectedTeam]) . "</b>";
 } else {
     echo "Showing all players";
 }
-
 echo " — Page {$page} of {$totalPages} ({$total} total)";
 ?>
 </p>
@@ -216,7 +225,7 @@ foreach($players as $p): ?>
 
 <!-- 모달 섹션 -->
 <?php if ($isAdmin): ?>
-  
+
 <!-- Add Modal -->
 <div id="addModal" class="modal">
   <div class="modal-content">
@@ -265,6 +274,7 @@ foreach($players as $p): ?>
     </form>
   </div>
 </div>
+
 <?php endif; ?>
 
 <script>

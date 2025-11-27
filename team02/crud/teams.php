@@ -23,10 +23,52 @@ if ($isAdmin && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 팀 삭제
     if (isset($_POST['delete_team'])) {
-        $id = $_POST['team_id'];
-        $stmt = $pdo->prepare("DELETE FROM teams WHERE team_id=:id");
-        $stmt->execute([':id' => $id]);
-        echo "<p style='color:red;text-align:center;'>🗑 Team deleted successfully!</p>";
+      $id = $_POST['team_id'];
+
+      // 1) team_id 기반 match_events 삭제
+      $stmt = $pdo->prepare("DELETE FROM match_events WHERE team_id = :id");
+      $stmt->execute([':id' => $id]);
+
+      // 2) player_id 기반 match_events 삭제
+      $stmt = $pdo->prepare("
+          DELETE FROM match_events 
+          WHERE player_id IN (SELECT player_id FROM players WHERE team_id = :id)
+      ");
+      $stmt->execute([':id' => $id]);
+
+      // 3) assist_player_id 기반 match_events 삭제
+      $stmt = $pdo->prepare("
+          DELETE FROM match_events 
+          WHERE assist_player_id IN (SELECT player_id FROM players WHERE team_id = :id)
+      ");
+      $stmt->execute([':id' => $id]);
+
+      // 4) match_id 기반 match_events 삭제
+      $stmt = $pdo->prepare("
+          DELETE FROM match_events
+          WHERE match_id IN (
+              SELECT match_id FROM matches
+              WHERE home_team_id = :id OR away_team_id = :id
+          )
+      ");
+      $stmt->execute([':id' => $id]);
+
+      // 5) matches 삭제
+      $stmt = $pdo->prepare("
+          DELETE FROM matches
+          WHERE home_team_id = :id OR away_team_id = :id
+      ");
+      $stmt->execute([':id' => $id]);
+
+      // 6) players 삭제
+      $stmt = $pdo->prepare("DELETE FROM players WHERE team_id = :id");
+      $stmt->execute([':id' => $id]);
+
+      // 7) team 삭제
+      $stmt = $pdo->prepare("DELETE FROM teams WHERE team_id = :id");
+      $stmt->execute([':id' => $id]);
+
+      echo "<p style='color:red;text-align:center;'>🗑 Team deleted successfully!</p>";
     }
 }
 
