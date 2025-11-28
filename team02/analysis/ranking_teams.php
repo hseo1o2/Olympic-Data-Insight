@@ -1,9 +1,15 @@
 <?php
+ /**
+ * SQL: 김서연
+ * Backend: 김현영
+ * Frontend: 장현서
+ */
 require_once '../includes/db.php';
 require_once '../includes/auth.php';
 requireLogin();
 include '../partials/header.php';
 
+// 팀별 승/무/패를 기준으로 3/1/0 점수를 계산하는 쿼리
 $sql = "
 SELECT 
     team,
@@ -29,6 +35,7 @@ FROM (
 ORDER BY points DESC;
 ";
 
+// 쿼리 실행
 $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
