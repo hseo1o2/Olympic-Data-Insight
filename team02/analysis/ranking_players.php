@@ -4,7 +4,6 @@
  * Backend: 김현영
  * Frontend: 장현서, 강민경
  */
-
 require_once '../includes/db.php';
 require_once '../includes/auth.php';
 requireLogin();
