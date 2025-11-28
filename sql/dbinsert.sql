@@ -1,5 +1,5 @@
 -- @author: 김서연
-
+USE team02;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ---------------------------
