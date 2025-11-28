@@ -1,14 +1,21 @@
 <?php
+ /**
+ * SQL: 김서연
+ * Backend: 김현영
+ * Frontend: 장현서, 강민경
+ */
 require_once '../includes/db.php';
 require_once '../includes/auth.php';
 requireLogin();
 include '../partials/header.php';
 
+// 드롭다운용 팀 목록 불러오기
 $teams = $pdo->query("SELECT team_name FROM teams ORDER BY team_name")
              ->fetchAll(PDO::FETCH_COLUMN);
 
 $selectedTeam = $_GET['team'] ?? '';
 
+// 이동 평균(Moving Average) 핵심 SQL
 $sql = "
 SELECT 
     t.team_name,
