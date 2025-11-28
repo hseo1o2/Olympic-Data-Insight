@@ -1,3 +1,9 @@
+<?php
+/**
+ * Frontend: 강민경
+ */
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
