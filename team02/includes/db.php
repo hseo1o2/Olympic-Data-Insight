@@ -1,6 +1,9 @@
 <?php
-// DB CONNECTION 
+/**
+ * Backend: 김서연
+ */
 
+// DB CONNECTION 
 $host = "localhost";
 $dbname = "team02";      // 팀 DB 이름
 $user = "team02";        // DB 사용자명
