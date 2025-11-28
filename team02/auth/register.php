@@ -1,4 +1,8 @@
 <?php
+/**
+ * Backend: 김현영
+ * Frontend: 강민경
+ */
 session_start();
 require_once '../includes/db.php';
 require_once '../includes/auth.php';
@@ -110,4 +114,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p>Already have an account? <a href="login.php">Login here</a></p>
 </body>
 </html>
+
 
