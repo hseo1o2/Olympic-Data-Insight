@@ -1,4 +1,10 @@
 <?php
+ /**
+ * SQL: 김서연
+ * Backend: 김현영
+ * Frontend: 장현서, 강민경
+ */
+
 require_once '../includes/db.php';
 require_once '../includes/auth.php';
 requireLogin();
@@ -7,7 +13,7 @@ include '../partials/header.php';
 // 사용자 입력을 통해 팀 필터링 처리
 $teamFilter = isset($_GET['team']) ? $_GET['team'] : '';
 
-// SQL 쿼리
+// 골 이벤트 기반 선수 랭킹 조회 
 $sql = "
 SELECT 
     p.player_name,
