@@ -1,9 +1,15 @@
 <?php
+ /**
+ * SQL: 김서연
+ * Backend: 김현영
+ * Frontend: 장현서, 강민경
+ */
 require_once '../includes/db.php';
 require_once '../includes/auth.php';
 requireLogin();
 include '../partials/header.php';
 
+// GET에서 팀 ID 받기
 $tid = $_GET['team_id'] ?? null;
 if (!$tid) {
     echo "<p style='color:red;text-align:center;'>⚠️ Invalid team ID.</p>";
@@ -11,6 +17,7 @@ if (!$tid) {
     exit;
 }
 
+// 홈/원정 필터 (기본값: 전체)
 $type = $_GET['type'] ?? 'all';
 
 $extra = "";
@@ -20,6 +27,7 @@ if ($type === "home") {
     $extra = " AND m.away_team_id = t.team_id ";
 }
 
+// 팀의 홈/원정 기록 요약
 $sql = "
 SELECT
     t.team_name,
