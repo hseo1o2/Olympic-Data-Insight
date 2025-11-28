@@ -11,14 +11,14 @@ INSERT IGNORE INTO seasons (season_name) VALUES ('24-25');
 -- ---------------------------
 -- 2. CSV 파일 로딩
 -- ---------------------------
-LOAD DATA INFILE 'C:\\xampp\\team02\\data\\summary.csv'
+LOAD DATA INFILE 'C:\\xampp\\htdocs\\team02\\data\\summary.csv'
 INTO TABLE staging_summary
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
 IGNORE 1 ROWS;
 
-LOAD DATA INFILE 'C:\\xampp\\team02\\data\\events.csv'
+LOAD DATA INFILE 'C:\\xampp\\htdocs\\team02\\data\\events.csv'
 INTO TABLE staging_events
 CHARACTER SET utf8mb4
 FIELDS TERMINATED BY ',' ENCLOSED BY '"'
