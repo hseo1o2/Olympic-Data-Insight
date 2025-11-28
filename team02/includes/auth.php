@@ -1,4 +1,8 @@
 <?php
+/**
+ * Backend: 김현영
+ */
+
 // AUTHENTICATION & ACCESS CONTROL 
 
 // 세션 시작 (중복 방지)
