@@ -1,5 +1,10 @@
 # EPL 24–25 – Football Performance Insight
 
+EPL 2024–2025 경기 데이터를 관계형 데이터베이스로 구성하고, 선수와 팀의
+성과를 다양한 SQL 분석 관점에서 탐색하는 웹 애플리케이션입니다. 데이터
+적재부터 인증, CRUD, 집계·순위·윈도 함수 기반 분석 화면까지 구현한 데이터베이스
+수업 팀 프로젝트입니다.
+
 A web-based sports analytics platform for the EPL 2024–2025 season, built with Apache + PHP + MariaDB (XAMPP).  
 Includes CRUD operations, advanced SQL analytics (Group By, Rollup/Drill-Down, Ranking, Windowing), user authentication, and full DB initialization scripts.
 
